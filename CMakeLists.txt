@@ -114,7 +114,48 @@ if(WGL_INCLUDE_DIR AND NOT GLXW_USE_EGL)
 endif()
 
 if(GLXW_USE_EGL)
-    add_custom_command(
+   if(RASPBERRYPI)
+      find_path(GLXW_EGL_PATH include/EGL/egl.h HINTS /opt/vc/)
+
+      include_directories(${GLXW_EGL_PATH}/include)
+      include_directories(${GLXW_EGL_PATH}/include/interface/vcos/pthreads)
+
+      add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/egl.h
+        COMMAND
+            cp 
+            ${GLXW_EGL_PATH}/include/EGL/egl.h 
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/egl.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+      add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglext.h
+        COMMAND
+            cp 
+            ${GLXW_EGL_PATH}/include/EGL/eglext.h 
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglext.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+      add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglplatform.h
+        COMMAND
+            cp 
+            ${GLXW_EGL_PATH}/include/EGL/eglplatform.h 
+            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglplatform.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+      add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/include/KHR/khrplatform.h
+        COMMAND
+            cp 
+            ${GLXW_EGL_PATH}/include/KHR/khrplatform.h
+            ${CMAKE_CURRENT_BINARY_DIR}/include/KHR/khrplatform.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+       
+   else()
+   
+      add_custom_command(
         OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/egl.h
             ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglext.h
@@ -129,6 +170,8 @@ if(GLXW_USE_EGL)
             --output ${CMAKE_CURRENT_BINARY_DIR}
         MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/glxw_gen.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+    endif()
 
     add_custom_command(
         OUTPUT
