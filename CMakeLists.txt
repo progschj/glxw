@@ -114,50 +114,30 @@ if(WGL_INCLUDE_DIR AND NOT GLXW_USE_EGL)
 endif()
 
 if(GLWT_USE_EGL) 
-#if(GLXW_USE_EGL) 
-   message("GLXW use EGL")
-   find_path(GLXW_EGL_PATH include/EGL/egl.h HINTS /opt/vc/)
-   if(GLXW_EGL_PATH)
-      message("Using local headers for GLXW")
-      
-      include_directories(${GLXW_EGL_PATH}/include)
-      include_directories(${GLXW_EGL_PATH}/include/interface/vcos/pthreads)
+#if(GLXW_USE_EGL)
 
-      execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/)
-      execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/KHR/)
- 
-      add_custom_command(
+   if(RASPBERRYPI)
+       message("using --no-platform since we are on a Raspberry PI")
+       find_path(GLXW_EGL_PATH include/EGL/egl.h HINTS /opt/vc)
+       include_directories(${GLXW_EGL_PATH}/include)
+       include_directories(${GLXW_EGL_PATH}/include/interface/vcos/pthreads)
+       add_custom_command(
         OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/egl.h
-        COMMAND
-            cp 
-            ${GLXW_EGL_PATH}/include/EGL/egl.h 
-            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/egl.h
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-      add_custom_command(
-        OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglext.h
-        COMMAND
-            cp 
-            ${GLXW_EGL_PATH}/include/EGL/eglext.h 
-            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglext.h
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-      add_custom_command(
-        OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglplatform.h
-        COMMAND
-            cp 
-            ${GLXW_EGL_PATH}/include/EGL/eglplatform.h 
-            ${CMAKE_CURRENT_BINARY_DIR}/include/EGL/eglplatform.h
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-      add_custom_command(
-        OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/include/KHR/khrplatform.h
         COMMAND
-            cp 
-            ${GLXW_EGL_PATH}/include/KHR/khrplatform.h
-            ${CMAKE_CURRENT_BINARY_DIR}/include/KHR/khrplatform.h
+            ${PYTHON_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/glxw_gen.py
+            --api egl
+            --download
+            --no-platform
+            --include ${CMAKE_CURRENT_SOURCE_DIR}/include
+            --output ${CMAKE_CURRENT_BINARY_DIR}
+        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/glxw_gen.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
        
    else()
    
